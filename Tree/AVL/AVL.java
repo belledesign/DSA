@@ -140,6 +140,87 @@ public class AVL
         System.out.print(root.data+" ");
     }
     
+    Node minValueNode(Node node)  
+    {  
+        Node current = node;  
+  
+        while (current.left != null)  
+            current = current.left;  
+        return current;  
+    }  
+  
+    Node deleteNode(Node root, int data)  
+    {  
+        // BST Delete  
+        if (root == null)  
+            return root;  
+        if (data < root.data)  
+            root.left = deleteNode(root.left, data);   
+        else if (data > root.data)  
+            root.right = deleteNode(root.right, data);  
+        else
+        {  
+  
+            // node with only one child or no child  
+            if ((root.left == null) || (root.right == null))  
+            {  
+                Node temp = null;  
+                if (temp == root.left)  
+                    temp = root.right;  
+                else
+                    temp = root.left;  
+  
+                if (temp == null)  
+                {  
+                    temp = root;  
+                    root = null;  
+                }  
+                else 
+                    root = temp; 
+            }  
+            else
+            {  
+  
+                // node with two children(smallest in the right subtree)  
+                Node temp = minValueNode(root.right);  
+                root.data = temp.data;  
+                root.right = deleteNode(root.right, temp.data);  
+            }  
+        }  
+  
+        // If the tree had only one node  
+        if (root == null)  
+            return root;  
+  
+        // Update Height  
+        root.height = Math.max(height(root.left), height(root.right)) + 1;  
+  
+        // whether unbalanced or not  
+        int balance = getBalance(root);  
+  
+        // Left Left Case  
+        if (balance > 1 && getBalance(root.left) >= 0)  
+            return rightRotate(root);  
+  
+        // Left Right Case  
+        if (balance > 1 && getBalance(root.left) < 0)  
+        {  
+            root.left = leftRotate(root.left);  
+            return rightRotate(root);  
+        }  
+  
+        // Right Right Case  
+        if (balance < -1 && getBalance(root.right) <= 0)  
+            return leftRotate(root);  
+  
+        // Right Left Case  
+        if (balance < -1 && getBalance(root.right) > 0)  
+        {  
+            root.right = rightRotate(root.right);  
+            return leftRotate(root);  
+        }  
+        return root;  
+    }
 
     public static void main(String[] args) { 
         AVL tree = new AVL(); 
@@ -151,6 +232,7 @@ public class AVL
         tree.root = tree.insert(tree.root, 40); 
         tree.root = tree.insert(tree.root, 50); 
         tree.root = tree.insert(tree.root, 25); 
+        tree.root = tree.insert(tree.root, 8); 
 
         /* The constructed AVL Tree would be 
             30 
@@ -158,7 +240,28 @@ public class AVL
            20 40 
            / \  \ 
           10 25 50 
+          /
+         8
         */
+        System.out.println("Preorder traversal of constructed tree is : "); 
+        tree.preorder(tree.root);
+        System.out.println();
+        System.out.println("Inorder traversal of constructed tree is : "); 
+        tree.inorder(tree.root);
+        System.out.println();
+        System.out.println("Postorder traversal of constructed tree is : "); 
+        tree.postorder(tree.root);
+        // Now Removing 20
+        /* The AVL Tree after deletion 
+            30 
+            / \ 
+           10 40 
+           / \  \ 
+          8 25 50 
+        
+        */
+        tree.deleteNode(tree.root, 20);
+        System.out.println("\n\nAfter Removing value 20\n");
         System.out.println("Preorder traversal of constructed tree is : "); 
         tree.preorder(tree.root);
         System.out.println();
